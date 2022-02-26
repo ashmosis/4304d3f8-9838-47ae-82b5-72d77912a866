@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-Refactoring.ApiConsumer-B423E43E-909A-432E-A6F0-519BA00BD234</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Faker.Net" Version="1.5.138" />
+    <PackageReference Include="MassTransit.Analyzers" Version="7.2.1" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.13" />
+    <PackageReference Include="NBuilder" Version="6.1.0" />
+  </ItemGroup>
+</Project>
