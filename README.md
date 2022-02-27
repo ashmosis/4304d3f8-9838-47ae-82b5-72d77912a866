@@ -28,4 +28,6 @@
 
 ## Candidate Comments
 
+I ran out of time, but was planning on pulling the credit checks out into the CandidateCreditService so that all of the credit check code was in one place. I am not happy with that part of what I have submitted. I would have also written more test cases to check edge cases. There is still more to be done but ran out of time.
+
 ### Here is where candidates can leave comments*
