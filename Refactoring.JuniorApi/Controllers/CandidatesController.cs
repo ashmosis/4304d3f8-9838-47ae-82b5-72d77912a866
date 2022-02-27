@@ -1,4 +1,8 @@
-﻿namespace Refactoring.JuniorApi.Controllers
+﻿using Refactoring.LegacyService.Candidate.Repositories;
+using Refactoring.LegacyService.Candidate.Services;
+using Refactoring.LegacyService.Position.Repositories;
+
+namespace Refactoring.JuniorApi.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
@@ -15,7 +19,7 @@
         public CandidatesController(ILogger<CandidatesController> logger)
         {
             _logger = logger;
-            _candidateService = new CandidateService();
+            _candidateService = new CandidateService(new PositionRepository(), new CandidateCreditServiceClient(), new CandidateDataAccess());
         }
 
         [HttpPost]

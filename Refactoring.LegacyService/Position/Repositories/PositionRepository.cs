@@ -1,14 +1,15 @@
-﻿namespace Refactoring.LegacyService
-{
-    using System.Configuration;
-    using System.Data;
-    using System.Data.SqlClient;
+﻿using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using Refactoring.LegacyService.Position.Model;
 
-    public class PositionRepository
+namespace Refactoring.LegacyService.Position.Repositories
+{
+    public class PositionRepository : IPositionRepository
     {
-        public Position GetById(int id)
+        public Model.Position GetById(int id)
         {
-            Position position = null;
+            Model.Position position = null;
             var connectionString = ConfigurationManager.ConnectionStrings["applicationDatabase"].ConnectionString;
 
             using (var connection = new SqlConnection(connectionString))
@@ -27,7 +28,7 @@
                 var reader = command.ExecuteReader(CommandBehavior.CloseConnection);
                 while (reader.Read())
                 {
-                    position = new Position
+                    position = new Model.Position
                     {
                         Id = int.Parse(reader["positionId"].ToString()),
                         Name = reader["Name"].ToString(),
