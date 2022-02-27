@@ -1,18 +1,28 @@
 ﻿using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using Refactoring.LegacyService.Position.Model;
+using Refactoring.LegacyService.Positions.Models;
 
-namespace Refactoring.LegacyService.Position.Repositories
+namespace Refactoring.LegacyService.Positions.Repositories
 {
     public class PositionRepository : IPositionRepository
     {
-        public Model.Position GetById(int id)
+        private readonly string _connectionString;
+        public PositionRepository()
         {
-            Model.Position position = null;
-            var connectionString = ConfigurationManager.ConnectionStrings["applicationDatabase"].ConnectionString;
+            _connectionString = ConfigurationManager.ConnectionStrings["applicationDatabase"].ConnectionString;
+        }
 
-            using (var connection = new SqlConnection(connectionString))
+        public PositionRepository(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+        public Position GetById(int id)
+        {
+            Position position = null;
+
+            using (var connection = new SqlConnection(_connectionString))
             {
                 var command = new SqlCommand
                 {
@@ -28,7 +38,7 @@ namespace Refactoring.LegacyService.Position.Repositories
                 var reader = command.ExecuteReader(CommandBehavior.CloseConnection);
                 while (reader.Read())
                 {
-                    position = new Model.Position
+                    position = new Position
                     {
                         Id = int.Parse(reader["positionId"].ToString()),
                         Name = reader["Name"].ToString(),

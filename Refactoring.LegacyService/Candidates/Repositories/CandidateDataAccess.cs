@@ -2,11 +2,11 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Refactoring.LegacyService.Candidate.Repositories
+namespace Refactoring.LegacyService.Candidates.Repositories
 {
-    public class CandidateDataAccess : ICandidateDataAccess
+    public static class CandidateDataAccess
     {
-        public void AddCandidate(Candidate candidate)
+        public static void AddCandidate(IApplicant candidate)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["applicationDatabase"].ConnectionString;
 

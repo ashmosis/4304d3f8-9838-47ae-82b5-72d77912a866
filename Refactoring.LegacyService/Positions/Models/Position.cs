@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Refactoring.LegacyService.Position.Model
+﻿namespace Refactoring.LegacyService.Positions.Models
 {
     public class Position
     {

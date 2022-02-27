@@ -1,6 +1,4 @@
-﻿using Refactoring.LegacyService.Candidate.Repositories;
-using Refactoring.LegacyService.Candidate.Services;
-using Refactoring.LegacyService.Position.Repositories;
+﻿using Refactoring.LegacyService.Candidates.Services;
 
 namespace Refactoring.JuniorApi.Controllers
 {
@@ -14,12 +12,13 @@ namespace Refactoring.JuniorApi.Controllers
     public class CandidatesController : ControllerBase
     {
         private readonly ILogger<CandidatesController> _logger;
-        private readonly CandidateService _candidateService;
+        private readonly ICandidateService _candidateService;
 
-        public CandidatesController(ILogger<CandidatesController> logger)
+        public CandidatesController(ILogger<CandidatesController> logger, ICandidateService candidateService)
         {
             _logger = logger;
-            _candidateService = new CandidateService(new PositionRepository(), new CandidateCreditServiceClient(), new CandidateDataAccess());
+
+            _candidateService = candidateService;
         }
 
         [HttpPost]

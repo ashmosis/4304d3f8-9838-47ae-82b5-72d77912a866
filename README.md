@@ -28,6 +28,20 @@
 
 ## Candidate Comments
 
-I ran out of time, but was planning on pulling the credit checks out into the CandidateCreditService so that all of the credit check code was in one place. I am not happy with that part of what I have submitted. I would have also written more test cases to check edge cases. There is still more to be done but ran out of time.
+I had initially run out of time and was not happy with my implementation. In truth, I did not do well with the time aspect as normally I would take the time to think about the design first.
 
-### Here is where candidates can leave comments*
+The new design separates concerns by delegating responsibilities. In this way the service becomes extremely streamlined, it's sole purpose is to retrieve a built candidate from the parameters and place it in the repo.
+
+The builder does most of the heavy lifting. I had chosen a builder as it will ensure that we can't have a half-baked candidate that does not have the requisite checks completed before storing in the db. It also encapsulates the validation logic nicely.
+
+I did move the responsibility of adjusting the credit score to the CandidateCreditService, although this could be added to the builder, the service already had access to the original credit score, Additionally, if I was looking for credit related methods, that would be where I would be looking.
+
+I did have to make some changes in order to support dependency injection, both in the legacy service and in the web layer.
+
+With regards to the JuniorApi; my recommendation would be the following:
+1. Pull the validation out of the Controller, it does not belong there. The controller should be really simple; then the service and return the result.
+2. The CandidateRequest should be in it's own file.
+3. Validation can be delegated to something like [FluentValidation](https://fluentvalidation.net/) which means the validator would be in it's own class/file too. Alternatively, they can make use of the validation provided by [.Net Core](https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation?view=aspnetcore-3.1) by adding validation attributes to the model.
+4. Without being too restrictive, we should really do a better job with validation. Names should have a max acceptable length and email address should be validated to a known format.
+5. We should try not to re-throw the exception at the controller level, rather wwe should log the exception and try to handle known exception paths, but ultimately return a http response ourselves (ie. 404 for an unhandled exception).
+6. Strings that are used, like in [Startup](./Refactoring.JuniorApi/Startup.cs) should be moved to a constants file.

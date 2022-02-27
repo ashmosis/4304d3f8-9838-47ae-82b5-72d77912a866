@@ -1,117 +1,80 @@
 using System;
 using Xunit;
 using Moq;
-using Refactoring.LegacyService.Candidate.Repositories;
-using Refactoring.LegacyService.Candidate.Services;
-using Refactoring.LegacyService.Position.Model;
-using Refactoring.LegacyService.Position.Repositories;
+using Refactoring.LegacyService.Candidates;
+using Refactoring.LegacyService.Candidates.Repositories;
+using Refactoring.LegacyService.Candidates.Services;
+using Refactoring.LegacyService.Positions.Models;
 
 namespace Refactoring.LegacyService.Tests
 {
     public class CandidateServiceTests
     {
-        private Mock<IPositionRepository> _mockPositionRepo;
-        private Mock<ICandidateCreditService> _mockCandidateCreditServiceClient;
-        private Mock<ICandidateDataAccess> _mockCandidateDataAccess;
-        private Position.Model.Position _position;
+        private Mock<ICandidateDataAccessProxy> _mockCandidateDataAccess;
+        private Mock<ICandidateBuilder> _mockCandidateBuilder;
+        private Mock<IExpectsPosition> _mockWithDetails;
+        private Mock<IExpectsCreditCheck> _mockWithPosition;
+        private IApplicant _candidate;
 
-        protected void Setup(string firstname, string surname, string email, DateTime dob, int positionId)
+        protected void Setup()
         {
-            _mockPositionRepo = new Mock<IPositionRepository>();
-            _mockCandidateCreditServiceClient = new Mock<ICandidateCreditService>();
-            _mockCandidateDataAccess = new Mock<ICandidateDataAccess>();
+            _mockCandidateDataAccess = new Mock<ICandidateDataAccessProxy>();
+            _mockCandidateBuilder = new Mock<ICandidateBuilder>();
+            _mockWithDetails = new Mock<IExpectsPosition>();
+            _mockWithPosition = new Mock<IExpectsCreditCheck>();
 
-            _position = new Position.Model.Position
+            var position = new Position
             {
-                Id = positionId,
+                Id = 1,
                 Name = "SecuritySpecialist",
                 Status = PositionStatus.none
             };
 
-            _mockPositionRepo.Setup(x => x.GetById(positionId)).Returns(_position);
-            _mockCandidateCreditServiceClient.Setup(x => x.GetCredit(firstname, surname, dob)).Returns(10000);
-            _mockCandidateDataAccess.Setup(x => x.AddCandidate(It.IsAny<Candidate.Candidate>())).Verifiable();
-        }
+            _candidate = new Candidate
+            {
+                Position = position,
+                DateOfBirth = new DateTime(1990, 01, 01),
+                EmailAddress = "test.user@example.com",
+                Firstname = "Test",
+                Surname = "User",
+                RequireCreditCheck = false,
+                Credit = 0
+            };
 
-        [InlineData("Test", "User", "test.user@example.com", "1990/1/1", 1)]
-        [Theory]
-        public void ShouldAddCandidateWithValidData(string firstname, string surname, string email,
-            string dateOfBirth, int positionId)
-        {
-            DateTime.TryParse(dateOfBirth, out var dob);
+            _mockWithPosition.Setup(x => x.CreditCheck()).Returns(_candidate);
 
-            Setup(firstname, surname, email, dob, positionId);
-            var candidateService = new CandidateService(_mockPositionRepo.Object, _mockCandidateCreditServiceClient.Object, _mockCandidateDataAccess.Object);
-            
-            Assert.True(candidateService.AddCandidate(firstname, surname, email, dob, positionId));
+            _mockWithDetails.Setup(x => x.WithPosition(It.IsAny<int>())).Returns(_mockWithPosition.Object);
+
+            _mockCandidateBuilder.Setup(x => x.Create(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<DateTime>()))
+                .Returns(_mockWithDetails.Object);
+
+            _mockCandidateDataAccess.Setup(x => x.AddCandidate(It.IsAny<Candidate>())).Verifiable();
         }
         
         [Fact]
-        public void ShouldFailWithInvalidFirstName()
+        public void ShouldReturnTrueWhenCandidateAdded()
         {
-
-            var firstname = "";
-            var surname = "Example";
-            var email = "test.user@example.com";
-            var dob = new DateTime(1990, 1, 1);
-            var positionId = 1;
+            Setup();
+            var candidateService = new CandidateService(_mockCandidateBuilder.Object, _mockCandidateDataAccess.Object);
             
-            Setup(firstname, surname, email, dob, positionId);
-
-            var candidateService = new CandidateService(_mockPositionRepo.Object, _mockCandidateCreditServiceClient.Object, _mockCandidateDataAccess.Object);
-
-            Assert.False(candidateService.AddCandidate(firstname, surname, email, dob, positionId));
+            Assert.True(candidateService.AddCandidate(_candidate.Firstname, _candidate.Surname, _candidate.EmailAddress, _candidate.DateOfBirth, _candidate.Position.Id));
         }
 
         [Fact]
-        public void ShouldFailWithInvalidSurname()
+        public void ShouldReturnFalseWhenCandidateNotAdded()
         {
-            var firstname = "Test";
-            var surname = "";
-            var email = "test.user@example.com";
-            var dob = new DateTime(1990, 1, 1);
-            var positionId = 1;
+            Setup();
+            var candidateService = new CandidateService(_mockCandidateBuilder.Object, _mockCandidateDataAccess.Object);
 
-            Setup(firstname, surname, email, dob, positionId);
+            _mockCandidateBuilder
+                .Setup(x => x.Create(_candidate.Firstname, _candidate.Surname, _candidate.EmailAddress,
+                    _candidate.DateOfBirth)).Throws(new ArgumentException());
 
-            var candidateService = new CandidateService(_mockPositionRepo.Object, _mockCandidateCreditServiceClient.Object, _mockCandidateDataAccess.Object);
-
-            Assert.False(candidateService.AddCandidate(firstname, surname, email, dob, positionId));
-        }
-
-        [InlineData("test.userexample.com")]
-        [Theory]
-        public void ShouldFailWithInvalidEmail(string email)
-        {
-            var firstname = "Test";
-            var surname = "";
-            var dob = new DateTime(1990, 1, 1);
-            var positionId = 1;
-
-            Setup(firstname, surname, email, dob, positionId);
-
-            var candidateService = new CandidateService(_mockPositionRepo.Object, _mockCandidateCreditServiceClient.Object, _mockCandidateDataAccess.Object);
-
-            Assert.False(candidateService.AddCandidate(firstname, surname, email, dob, positionId));
-        }
-
-        [InlineData(100)]
-        [Theory]
-        public void ShouldFailWithInvalidCreditScore(int score)
-        {
-            var firstname = "Test";
-            var surname = "";
-            var email = "test.user@example.com";
-            var dob = new DateTime(1990, 1, 1);
-            var positionId = 1;
-
-            Setup(firstname, surname, email, dob, positionId);
-
-            _mockCandidateCreditServiceClient.Setup(x => x.GetCredit(firstname, surname, dob)).Returns(score);
-
-            var candidateService = new CandidateService(_mockPositionRepo.Object, _mockCandidateCreditServiceClient.Object, _mockCandidateDataAccess.Object);
-
-            Assert.False(candidateService.AddCandidate(firstname, surname, email, dob, positionId));
+            Assert.False(candidateService.AddCandidate(_candidate.Firstname, _candidate.Surname, _candidate.EmailAddress, _candidate.DateOfBirth, _candidate.Position.Id));
         }
     }
 }

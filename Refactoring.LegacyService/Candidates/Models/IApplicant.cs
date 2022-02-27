@@ -1,6 +1,7 @@
 ﻿using System;
+using Refactoring.LegacyService.Positions.Models;
 
-namespace Refactoring.LegacyService.Candidate
+namespace Refactoring.LegacyService.Candidates
 {
     public interface IApplicant
     {
@@ -8,7 +9,7 @@ namespace Refactoring.LegacyService.Candidate
         string EmailAddress { get; set; }
         string Firstname { get; set; }
         string Surname { get; set; }
-        Position.Model.Position Position { get; set; }
+        Position Position { get; set; }
         bool RequireCreditCheck { get; set; }
         int Credit { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿namespace Refactoring.LegacyService.Position.Constants
+﻿namespace Refactoring.LegacyService.Positions.Constants
 {
     public static class PositionNames
     {
