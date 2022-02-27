@@ -35,9 +35,11 @@ namespace Refactoring.LegacyService.Candidate.Services
                 Firstname = firstname,
                 Surname = surname
             };
-            
-            _candidateDataAccess.AddCandidate(candidate);
 
+            if (!HasSufficientCredit(500, candidate)) return false;
+
+            _candidateDataAccess.AddCandidate(candidate);
+            
             return true;
         }
 
