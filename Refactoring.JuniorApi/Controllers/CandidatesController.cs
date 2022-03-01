@@ -1,4 +1,6 @@
-﻿namespace Refactoring.JuniorApi.Controllers
+﻿using Refactoring.LegacyService.Candidates.Services;
+
+namespace Refactoring.JuniorApi.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
@@ -10,12 +12,13 @@
     public class CandidatesController : ControllerBase
     {
         private readonly ILogger<CandidatesController> _logger;
-        private readonly CandidateService _candidateService;
+        private readonly ICandidateService _candidateService;
 
-        public CandidatesController(ILogger<CandidatesController> logger)
+        public CandidatesController(ILogger<CandidatesController> logger, ICandidateService candidateService)
         {
             _logger = logger;
-            _candidateService = new CandidateService();
+
+            _candidateService = candidateService;
         }
 
         [HttpPost]

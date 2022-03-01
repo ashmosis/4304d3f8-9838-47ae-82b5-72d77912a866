@@ -1,17 +1,28 @@
-﻿namespace Refactoring.LegacyService
-{
-    using System.Configuration;
-    using System.Data;
-    using System.Data.SqlClient;
+﻿using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using Refactoring.LegacyService.Positions.Models;
 
-    public class PositionRepository
+namespace Refactoring.LegacyService.Positions.Repositories
+{
+    public class PositionRepository : IPositionRepository
     {
+        private readonly string _connectionString;
+        public PositionRepository()
+        {
+            _connectionString = ConfigurationManager.ConnectionStrings["applicationDatabase"].ConnectionString;
+        }
+
+        public PositionRepository(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
         public Position GetById(int id)
         {
             Position position = null;
-            var connectionString = ConfigurationManager.ConnectionStrings["applicationDatabase"].ConnectionString;
 
-            using (var connection = new SqlConnection(connectionString))
+            using (var connection = new SqlConnection(_connectionString))
             {
                 var command = new SqlCommand
                 {

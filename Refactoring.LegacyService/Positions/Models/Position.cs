@@ -1,4 +1,4 @@
-﻿namespace Refactoring.LegacyService
+﻿namespace Refactoring.LegacyService.Positions.Models
 {
     public class Position
     {
@@ -7,6 +7,7 @@
         public string Name { get; set; }
 
         public PositionStatus Status { get; set; }
+
     }
 
     public enum PositionStatus

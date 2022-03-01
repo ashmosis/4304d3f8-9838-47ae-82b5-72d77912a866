@@ -1,12 +1,12 @@
-﻿namespace Refactoring.LegacyService
-{
-    using System.Configuration;
-    using System.Data;
-    using System.Data.SqlClient;
+﻿using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 
+namespace Refactoring.LegacyService.Candidates.Repositories
+{
     public static class CandidateDataAccess
     {
-        public static void AddCandidate(Candidate candidate)
+        public static void AddCandidate(IApplicant candidate)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["applicationDatabase"].ConnectionString;
 

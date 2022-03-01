@@ -1,3 +1,11 @@
+using System.ServiceModel;
+using System.ServiceModel.Channels;
+using Refactoring.LegacyService;
+using Refactoring.LegacyService.Candidates;
+using Refactoring.LegacyService.Candidates.Repositories;
+using Refactoring.LegacyService.Candidates.Services;
+using Refactoring.LegacyService.Positions.Repositories;
+
 namespace Refactoring.JuniorApi
 {
     using Microsoft.AspNetCore.Builder;
@@ -19,8 +27,12 @@ namespace Refactoring.JuniorApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
+            services.AddScoped<ICandidateService, CandidateService>();
+            services.AddScoped<ICandidateBuilder, CandidateBuilder>();
+            services.AddScoped<IPositionRepository, PositionRepository>(x => new PositionRepository(Configuration.GetConnectionString("appDatabase")));
+            services.AddScoped<ICandidateCreditService, CandidateCreditServiceClient>(x => new CandidateCreditServiceClient(new CustomBinding(), new EndpointAddress("http://test.com.au")));
+            services.AddScoped<ICandidateDataAccessProxy, CandidateDataAccessProxy>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Refactoring.JuniorApi", Version = "v1" });

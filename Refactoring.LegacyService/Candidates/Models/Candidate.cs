@@ -1,8 +1,9 @@
-﻿namespace Refactoring.LegacyService
-{
-    using System;
+﻿using System;
+using Refactoring.LegacyService.Positions.Models;
 
-    public class Candidate
+namespace Refactoring.LegacyService.Candidates
+{
+    public class Candidate : IApplicant
     {
         public Position Position { get; set; }
         public DateTime DateOfBirth { get; set; }
